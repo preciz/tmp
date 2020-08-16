@@ -7,6 +7,7 @@ defmodule Tmp do
 
   @doc """
   Creates a temporary directory and passes the path to the given function.
+
   The function runs in a new linked GenServer process.
   The directory is automatically removed when the function returns or the
   process terminates.
