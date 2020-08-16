@@ -23,7 +23,7 @@ The function will be called with the path of a new temporary directory.
 If the function returns or the parent process exits the temporary directory is removed.
 
 Options:
- - `:basedir` defaults to `System.tmp_dir()`
+ - `:base_dir` defaults to `System.tmp_dir()`
  - `:dirname` defaults to a randomly generated uid
  - `:timeout` defaults to `:infinity`
 
