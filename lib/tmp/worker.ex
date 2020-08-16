@@ -36,7 +36,7 @@ defmodule Tmp.Worker do
 
   @impl GenServer
   def handle_call(:execute, _from, %State{path: path, function: function} = state) do
-    File.mkdir!(path)
+    File.mkdir_p!(path)
 
     reply = function.(path)
 

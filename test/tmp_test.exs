@@ -17,6 +17,17 @@ defmodule TmpTest do
     assert 4 == Tmp.dir(fn _ -> 2 + 2 end)
   end
 
+  test "Runs successfully when base_dir doesn't exists" do
+    uid =
+      :crypto.strong_rand_bytes(8)
+      |> Base.encode16(case: :lower)
+
+    base_dir = "/tmp/#{uid}/"
+    dirname = "yolo"
+
+    assert Path.join(base_dir, dirname) == Tmp.dir(fn path -> path end, base_dir: base_dir, dirname: dirname)
+  end
+
   test "Temporary directory exists in default base dir" do
     temp_pid =
       Tmp.dir(fn temp_dir_path ->
