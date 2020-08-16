@@ -1,5 +1,7 @@
 # Tmp
 
+![Actions Status](https://github.com/preciz/tmp/workflows/test/badge.svg)
+
 Temporary directories that are monitored and automatically removed.
 
 ## Installation
