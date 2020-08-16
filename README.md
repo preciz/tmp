@@ -33,7 +33,7 @@ Tmp.dir(fn tmp_dir_path ->
   # other important work
 
   2 + 2
-end)
+end, dirname: "yolo")
 # => 4
 ```
 
