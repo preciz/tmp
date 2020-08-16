@@ -13,6 +13,10 @@ defmodule TmpTest do
     refute File.exists?(temp_dir_path)
   end
 
+  test "Returns with return value from function" do
+    assert 4 == Tmp.dir(fn _ -> 2 + 2 end)
+  end
+
   test "Temporary directory exists in default base dir" do
     temp_pid =
       Tmp.dir(fn temp_dir_path ->
