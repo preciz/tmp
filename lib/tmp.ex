@@ -1,13 +1,21 @@
-defmodule Tempd do
+defmodule Tmp do
   @moduledoc """
   Temporary directories that are monitored and automatically removed.
   """
 
-  @default_base_dir Application.get_env(:tempd, :default_base_dir) || System.tmp_dir()
+  @default_base_dir Application.get_env(:tmp, :default_base_dir) || System.tmp_dir()
 
   @doc """
-      iex> Tempd.dir(fn _tmp_dir_path -> 1 + 1 end)
+  Creates a temporary directory and passes the path to the given function.
+  The function runs in a new linked GenServer process.
+  The directory is automatically removed when the function returns or the
+  process terminates.
+
+  ## Examples
+
+      iex> Tmp.dir(fn _tmp_dir_path -> 1 + 1 end)
       2
+
   """
   @spec dir(function, list) :: term()
   def dir(function, options \\ []) when is_function(function) do
@@ -16,7 +24,7 @@ defmodule Tempd do
 
     uid = random_uid()
 
-    Tempd.Worker.execute(base_dir, uid, function, timeout)
+    Tmp.Worker.execute(base_dir, uid, function, timeout)
   end
 
   defp random_uid do

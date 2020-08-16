@@ -1,4 +1,4 @@
-defmodule Tempd.Worker do
+defmodule Tmp.Worker do
   @moduledoc false
 
   use GenServer, restart: :temporary
@@ -12,33 +12,29 @@ defmodule Tempd.Worker do
   def execute(base_dir, uid, function, timeout) when is_binary(uid) and is_function(function) do
     state = %State{uid: uid, base_dir: base_dir, function: function}
 
-    {:ok, pid} = DynamicSupervisor.start_child(Tempd.DirSupervisor, {__MODULE__, [state]})
+    {:ok, pid} = start_link(state)
 
     GenServer.call(pid, :execute, timeout)
   end
 
-  def start_link([%State{base_dir: base_dir, uid: uid, function: function} = state])
-      when is_binary(base_dir) and is_binary(uid) and is_function(function) do
+  def start_link(%State{} = state) do
     GenServer.start_link(__MODULE__, state)
   end
 
   @impl GenServer
   def init(%State{} = state) do
-    Tempd.Cleaner.monitor({self(), dir_path(state)})
+    Tmp.Cleaner.monitor({self(), dir_path(state)})
 
-    {:ok, state, {:continue, :create_dir}}
-  end
-
-  @impl GenServer
-  def handle_continue(:create_dir, state) do
-    File.mkdir_p!(dir_path(state))
-
-    {:noreply, state}
+    {:ok, state}
   end
 
   @impl GenServer
   def handle_call(:execute, _from, %State{function: function} = state) do
-    reply = function.(dir_path(state))
+    path = dir_path(state)
+
+    File.mkdir!(path)
+
+    reply = function.(path)
 
     {:stop, :normal, reply, state}
   end

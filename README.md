@@ -1,21 +1,28 @@
-# Tempd
+# Tmp
 
-**TODO: Add description**
+Temporary directories that are monitored and automatically removed.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `tempd` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `tmp` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:tempd, "~> 0.1.0"}
+    {:tmp, "~> 0.1.0"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/tempd](https://hexdocs.pm/tempd).
+## Usage
 
+```elixir
+iex> Tmp.dir(fn tmp_dir_path -> File.touch(Path.join(tmp_dir_path, "file_one")); 2 + 2 end)
+4
+```
+
+Documentation can be found at [https://hexdocs.pm/tmp](https://hexdocs.pm/tmp).
+
+## License
+
+Tmp is [MIT licensed](LICENSE).

@@ -1,4 +1,4 @@
-defmodule Tempd.Cleaner do
+defmodule Tmp.Cleaner do
   @moduledoc false
 
   require Logger
