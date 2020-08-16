@@ -3,8 +3,6 @@ defmodule Tmp do
   Temporary directories that are monitored and automatically removed.
   """
 
-  @default_base_dir Application.get_env(:tmp, :default_base_dir) || System.tmp_dir()
-
   @doc """
   Creates a temporary directory and passes the path to the given function.
 
@@ -20,7 +18,8 @@ defmodule Tmp do
   """
   @spec dir(function, list) :: term()
   def dir(function, options \\ []) when is_function(function, 1) do
-    base_dir = Keyword.get(options, :base_dir, @default_base_dir)
+    base_dir = Keyword.get(options, :base_dir, default_base_dir())
+
     dirname = Keyword.get(options, :dirname, random_uid())
     timeout = Keyword.get(options, :timeout, :infinity)
 
@@ -29,5 +28,9 @@ defmodule Tmp do
 
   defp random_uid do
     :crypto.strong_rand_bytes(10) |> Base.encode16(case: :lower)
+  end
+
+  defp default_base_dir do
+    Application.get_env(:tmp, :default_base_dir) || System.tmp_dir()
   end
 end

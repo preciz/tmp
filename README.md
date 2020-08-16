@@ -37,6 +37,15 @@ end, dirname: "yolo")
 # => 4
 ```
 
+## Config
+
+To configure the default base dir:
+```
+config :tmp, default_base_dir: "/tmp/my_dir"
+```
+
+## Docs
+
 Documentation can be found at [https://hexdocs.pm/tmp](https://hexdocs.pm/tmp).
 
 ## License
