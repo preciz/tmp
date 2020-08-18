@@ -16,8 +16,11 @@ defmodule Tmp do
   ## Options
 
     * `:base_dir` - The directory where `:dirname` is going to be created.
+      Defaults to `System.tmp_dir()`.  To customize the default `:base_dir`
+      use config: `config :tmp, :default_base_dir, "my_dir"`
 
-    * `:dirname` - The name of the temporary directory
+    * `:dirname` - The name of the temporary directory.
+      Defaults to a random Base16 uid.
 
     * `:timeout` - How long the function is allowed to run before the
       GenServer call terminates, defaults to :infinity
