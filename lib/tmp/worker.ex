@@ -38,7 +38,16 @@ defmodule Tmp.Worker do
   def handle_call(:execute, _from, %State{path: path, function: function} = state) do
     File.mkdir_p!(path)
 
-    reply = function.(path)
+    reply =
+      case function do
+        function when is_function(function, 1) ->
+          function.(path)
+
+        function when is_function(function, 2) ->
+          keep = fn -> Tmp.Cleaner.demonitor(self()) end
+
+          function.(path, keep)
+      end
 
     {:stop, :normal, reply, state}
   end

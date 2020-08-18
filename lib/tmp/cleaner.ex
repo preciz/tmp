@@ -19,22 +19,32 @@ defmodule Tmp.Cleaner do
     GenServer.cast(__MODULE__, {:monitor, {pid, dir}})
   end
 
-  def handle_cast({:monitor, {pid, dir}}, state) do
-    Process.monitor(pid)
+  def demonitor(pid) when is_pid(pid) do
+    GenServer.call(__MODULE__, {:demonitor, pid})
+  end
 
-    {:noreply, Map.put(state, pid, dir)}
+  def handle_cast({:monitor, {pid, dir}}, state) do
+    monitor_ref = Process.monitor(pid)
+
+    {:noreply, Map.put(state, pid, {monitor_ref, dir})}
+  end
+
+  def handle_call({:demonitor, pid}, _from, state) do
+    {val, new_state} = Map.pop(state, pid)
+
+    with {monitor_ref, _dir} <- val do
+      Process.demonitor(monitor_ref)
+    end
+
+    {:reply, :ok, new_state}
   end
 
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
-    new_state =
-      case Map.get(state, pid) do
-        dir when is_binary(dir) ->
-          File.rm_rf!(dir)
-          Map.delete(state, pid)
+    {val, new_state} = Map.pop(state, pid)
 
-        nil ->
-          state
-      end
+    with {_monitor_ref, dir} <- val do
+      File.rm_rf!(dir)
+    end
 
     {:noreply, new_state}
   end
