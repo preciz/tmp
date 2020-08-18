@@ -6,14 +6,41 @@ defmodule Tmp do
   @doc """
   Creates a temporary directory and passes the path to the given function.
 
-  The function runs in a new linked GenServer process.
+  `function` runs in a new linked GenServer process.
   The directory is automatically removed when the function returns or the
   process terminates.
 
+  To keep the temporary directory for debugging call the function passed as the
+  second argument to `function`.
+
+  ## Options
+
+    * `:base_dir` - The directory where `:dirname` is going to be created.
+
+    * `:dirname` - The name of the temporary directory
+
+    * `:timeout` - How long the function is allowed to run before the
+      GenServer call terminates, defaults to :infinity
+
+
   ## Examples
 
-      iex> Tmp.dir(fn _tmp_dir_path -> 1 + 1 end)
+      iex> Tmp.dir(fn tmp_dir_path ->
+      ...>   Path.join(tmp_dir_path, "my_new_file") |> File.touch()
+      ...>   1 + 1
+      ...> end)
       2
+
+  To keep the temporary directory for debugging:
+
+      iex> my_file = Tmp.dir(fn tmp_dir_path, keep ->
+      ...>   file_path = Path.join(tmp_dir_path, "my_new_file")
+      ...>   File.touch(file_path)
+      ...>   keep.()
+      ...>   file_path
+      ...> end)
+      ...> File.exists?(my_file)
+      true
 
   """
   @spec dir(function, list) :: term()
