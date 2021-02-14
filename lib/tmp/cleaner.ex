@@ -9,6 +9,7 @@ defmodule Tmp.Cleaner do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  @impl GenServer
   def init([]) do
     Process.flag(:trap_exit, true)
 
@@ -23,12 +24,14 @@ defmodule Tmp.Cleaner do
     GenServer.call(__MODULE__, {:demonitor, pid})
   end
 
+  @impl GenServer
   def handle_cast({:monitor, {pid, dir}}, state) do
     monitor_ref = Process.monitor(pid)
 
     {:noreply, Map.put(state, pid, {monitor_ref, dir})}
   end
 
+  @impl GenServer
   def handle_call({:demonitor, pid}, _from, state) do
     {val, new_state} = Map.pop(state, pid)
 
@@ -39,6 +42,7 @@ defmodule Tmp.Cleaner do
     {:reply, :ok, new_state}
   end
 
+  @impl GenServer
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
     {val, new_state} = Map.pop(state, pid)
 
@@ -49,10 +53,12 @@ defmodule Tmp.Cleaner do
     {:noreply, new_state}
   end
 
+  @impl GenServer
   def handle_info(_, state) do
     {:noreply, state}
   end
 
+  @impl GenServer
   def terminate(_reason, state) do
     state
     |> Enum.each(fn _pid, dir ->
