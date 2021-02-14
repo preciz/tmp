@@ -25,6 +25,9 @@ defmodule Tmp do
     * `:timeout` - How long the function is allowed to run before the
       GenServer call terminates, defaults to :infinity
 
+    * `:cleaner` - The name of the `Tmp.Cleaner` GenServer. Defaults to
+      `Tmp.Cleaner`.
+
 
   ## Examples
 
