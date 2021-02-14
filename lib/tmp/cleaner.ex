@@ -5,6 +5,14 @@ defmodule Tmp.Cleaner do
 
   use GenServer
 
+  def monitor({pid, dir}) when is_pid(pid) and is_binary(dir) do
+    GenServer.cast(__MODULE__, {:monitor, {pid, dir}})
+  end
+
+  def demonitor(pid) when is_pid(pid) do
+    GenServer.call(__MODULE__, {:demonitor, pid})
+  end
+
   def start_link(_ \\ []) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -14,14 +22,6 @@ defmodule Tmp.Cleaner do
     Process.flag(:trap_exit, true)
 
     {:ok, %{}}
-  end
-
-  def monitor({pid, dir}) when is_pid(pid) and is_binary(dir) do
-    GenServer.cast(__MODULE__, {:monitor, {pid, dir}})
-  end
-
-  def demonitor(pid) when is_pid(pid) do
-    GenServer.call(__MODULE__, {:demonitor, pid})
   end
 
   @impl GenServer
