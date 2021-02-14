@@ -29,7 +29,7 @@ defmodule Tmp.Worker do
 
   @impl GenServer
   def init(%State{path: path} = state) do
-    Tmp.Cleaner.monitor({self(), path})
+    Tmp.Cleaner.monitor(self(), path)
 
     {:ok, state}
   end
