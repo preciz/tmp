@@ -5,16 +5,18 @@ defmodule Tmp.Cleaner do
 
   use GenServer
 
-  def monitor(pid, dir) when is_pid(pid) and is_binary(dir) do
-    GenServer.cast(__MODULE__, {:monitor, {pid, dir}})
+  def monitor(pid, dir, cleaner \\ __MODULE__) when is_pid(pid) and is_binary(dir) and is_atom(cleaner) do
+    GenServer.cast(cleaner, {:monitor, {pid, dir}})
   end
 
-  def demonitor(pid) when is_pid(pid) do
-    GenServer.call(__MODULE__, {:demonitor, pid})
+  def demonitor(pid, cleaner \\ __MODULE__) when is_pid(pid) and is_atom(cleaner) do
+    GenServer.call(cleaner, {:demonitor, pid})
   end
 
-  def start_link(_ \\ []) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  def start_link(options \\ []) do
+    name = Keyword.get(options, :name, __MODULE__)
+
+    GenServer.start_link(__MODULE__, [], name: name)
   end
 
   @impl GenServer

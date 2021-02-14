@@ -49,11 +49,11 @@ defmodule Tmp do
   @spec dir(function, list) :: term()
   def dir(function, options \\ []) when is_function(function, 1) or is_function(function, 2) do
     base_dir = Keyword.get(options, :base_dir, default_base_dir())
-
     dirname = Keyword.get(options, :dirname, random_uid())
     timeout = Keyword.get(options, :timeout, :infinity)
+    cleaner = Keyword.get(options, :cleaner, Tmp.Cleaner)
 
-    Tmp.Worker.execute(base_dir, dirname, function, timeout)
+    Tmp.Worker.execute(base_dir, dirname, function, timeout, cleaner)
   end
 
   defp random_uid do

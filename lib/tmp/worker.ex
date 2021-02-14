@@ -4,18 +4,19 @@ defmodule Tmp.Worker do
   use GenServer, restart: :temporary
 
   defmodule State do
-    @enforce_keys [:path, :base_dir, :dirname, :function]
-    defstruct [:path, :base_dir, :dirname, :function]
+    @enforce_keys [:path, :base_dir, :dirname, :function, :cleaner]
+    defstruct [:path, :base_dir, :dirname, :function, :cleaner]
   end
 
-  @spec execute(binary, Path.t(), function, timeout) :: term()
-  def execute(base_dir, dirname, function, timeout)
-      when is_binary(dirname) and is_function(function) do
+  @spec execute(binary, Path.t(), function, timeout, atom) :: term()
+  def execute(base_dir, dirname, function, timeout, cleaner)
+      when is_binary(dirname) and is_function(function) and is_atom(cleaner) do
     state = %State{
       base_dir: base_dir,
       dirname: dirname,
       path: Path.join(base_dir, dirname),
-      function: function
+      function: function,
+      cleaner: cleaner
     }
 
     {:ok, pid} = start_link(state)
@@ -28,14 +29,14 @@ defmodule Tmp.Worker do
   end
 
   @impl GenServer
-  def init(%State{path: path} = state) do
-    Tmp.Cleaner.monitor(self(), path)
+  def init(%State{path: path, cleaner: cleaner} = state) do
+    Tmp.Cleaner.monitor(self(), path, cleaner)
 
     {:ok, state}
   end
 
   @impl GenServer
-  def handle_call(:execute, _from, %State{path: path, function: function} = state) do
+  def handle_call(:execute, _from, %State{path: path, function: function, cleaner: cleaner} = state) do
     File.mkdir_p!(path)
 
     reply =
@@ -44,7 +45,7 @@ defmodule Tmp.Worker do
           function.(path)
 
         function when is_function(function, 2) ->
-          keep = fn -> Tmp.Cleaner.demonitor(self()) end
+          keep = fn -> Tmp.Cleaner.demonitor(self(), cleaner) end
 
           function.(path, keep)
       end
