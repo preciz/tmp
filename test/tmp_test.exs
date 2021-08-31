@@ -24,7 +24,7 @@ defmodule TmpTest do
 
     base_dir = "/tmp/#{uid}/"
 
-    assert :ok == Tmp.dir(fn _path -> File.touch("a") end, base_dir: base_dir)
+    assert :ok == Tmp.dir(fn path -> File.touch(Path.join(path, "a")) end, base_dir: base_dir)
   end
 
   test "Temporary directory exists in default base dir" do
