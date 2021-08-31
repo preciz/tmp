@@ -11,7 +11,7 @@ The package can be installed by adding `tmp` to your list of dependencies in `mi
 ```elixir
 def deps do
   [
-    {:tmp, "~> 0.1.0"}
+    {:tmp, "~> 0.2.0"}
   ]
 end
 ```
