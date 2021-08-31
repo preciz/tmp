@@ -50,7 +50,7 @@ defmodule Tmp do
       ...>     tmp_dir_path
       ...>   end)
       ...> File.exists?(path)
-      ...> true
+      true
 
   """
   @spec keep(pid) :: :ok
