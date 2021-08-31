@@ -1,5 +1,7 @@
 defmodule Tmp.Worker do
-  @moduledoc false
+  @moduledoc """
+  Executes the function given to `Tmp.dir/2` in a GenServer process
+  """
 
   use GenServer, restart: :temporary
 
