@@ -37,19 +37,6 @@ end, dirname: "yolo")
 # => 4
 ```
 
-To keep the temporary directory for debugging or any other reason just call the function in the optional second argument:
-```elixir
-tmp_dir_path =
-  Tmp.dir(fn tmp_dir_path, keep ->
-    keep.() # calling this function will keep the temporary directory
-
-    tmp_dir_path
-  end)
-
-# ... debugging
-```
-
-
 ## Config
 
 To configure the default base dir:

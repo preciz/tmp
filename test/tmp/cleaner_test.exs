@@ -1,5 +1,5 @@
 defmodule Tmp.CleanerTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "Cleans up with terminate/2 callback on crash" do
     pid = self()

@@ -36,19 +36,10 @@ defmodule Tmp.Worker do
   end
 
   @impl GenServer
-  def handle_call(:execute, _from, %State{path: path, function: function, cleaner: cleaner} = state) do
+  def handle_call(:execute, _from, %State{path: path, function: function} = state) do
     File.mkdir_p!(path)
 
-    reply =
-      case function do
-        function when is_function(function, 1) ->
-          function.(path)
-
-        function when is_function(function, 2) ->
-          keep = fn -> Tmp.Cleaner.demonitor(self(), cleaner) end
-
-          function.(path, keep)
-      end
+    reply = function.(path)
 
     {:stop, :normal, reply, state}
   end

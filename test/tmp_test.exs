@@ -1,5 +1,5 @@
 defmodule TmpTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Tmp
 
   test "Auto cleans after process terminates" do
@@ -15,17 +15,6 @@ defmodule TmpTest do
 
   test "Returns with return value from function" do
     assert 4 == Tmp.dir(fn _ -> 2 + 2 end)
-  end
-
-  test "Keeps the directory if requested" do
-    temp_dir_path =
-      Tmp.dir(fn temp_dir_path, keep ->
-        :ok = keep.()
-
-        temp_dir_path
-      end)
-
-    assert File.exists?(temp_dir_path)
   end
 
   test "Runs successfully when base_dir doesn't exists" do

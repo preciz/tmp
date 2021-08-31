@@ -10,9 +10,6 @@ defmodule Tmp do
   The directory is automatically removed when the function returns or the
   process terminates.
 
-  To keep the temporary directory for debugging call the function passed as the
-  second argument to `function`.
-
   ## Options
 
     * `:base_dir` - The directory where `:dirname` is going to be created.
@@ -36,17 +33,6 @@ defmodule Tmp do
       ...>   1 + 1
       ...> end)
       2
-
-  To keep the temporary directory for debugging:
-
-      iex> my_file = Tmp.dir(fn tmp_dir_path, keep ->
-      ...>   file_path = Path.join(tmp_dir_path, "my_new_file")
-      ...>   File.touch(file_path)
-      ...>   keep.()
-      ...>   file_path
-      ...> end)
-      ...> File.exists?(my_file)
-      true
 
   """
   @spec dir(function, list) :: term()
