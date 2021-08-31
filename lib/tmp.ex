@@ -32,7 +32,7 @@ defmodule Tmp do
 
   """
   @spec dir(function, list) :: term()
-  def dir(function, options \\ []) when is_function(function, 1) or is_function(function, 2) do
+  def dir(function, options \\ []) when is_function(function, 1) do
     base_dir = Keyword.get(options, :base_dir, default_base_dir())
     prefix = Keyword.get(options, :prefix)
     timeout = Keyword.get(options, :timeout, :infinity)
