@@ -23,14 +23,14 @@ If the function returns or the calling process exits the temporary directory is 
 
 ```elixir
 Tmp.dir(fn tmp_dir_path ->
-  # ... do work with the path
+  # ... do work with tmp_dir_path
 end)
 ```
 
 Options:
- - `:base_dir` defaults to `System.tmp_dir()`
- - `:dirname` defaults to a randomly generated uid
- - `:timeout` defaults to `:infinity`
+ - `:prefix` (optional) prefix for the temporary directory, defaults to `nil`
+ - `:base_dir` (optional) base directory of the temprorary directory, defaults to `System.tmp_dir()`
+ - `:timeout` (optional) a timeout in milliseconds, defaults to `:infinity`
 
 ```elixir
 Tmp.dir(fn tmp_dir_path ->
@@ -38,7 +38,7 @@ Tmp.dir(fn tmp_dir_path ->
   # ... other important work
 
   2 + 2
-end, dirname: "yolo")
+end, prefix: "yolo", base_dir: "/tmp/my_app")
 # => 4
 ```
 

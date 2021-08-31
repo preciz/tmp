@@ -16,14 +16,13 @@ defmodule Tmp do
       Defaults to `System.tmp_dir()`.  To customize the default `:base_dir`
       use config: `config :tmp, :default_base_dir, "my_dir"`
 
-    * `:dirname` - The name of the temporary directory.
-      Defaults to a random Base16 uid.
+    * `:prefix` - Prefix the directory name
 
     * `:timeout` - How long the function is allowed to run before the
       GenServer call terminates, defaults to :infinity
 
     * `:cleaner` - The name of the `Tmp.Cleaner` GenServer. Defaults to
-      `Tmp.Cleaner`.
+      `Tmp.Cleaner`
 
 
   ## Examples
@@ -38,15 +37,22 @@ defmodule Tmp do
   @spec dir(function, list) :: term()
   def dir(function, options \\ []) when is_function(function, 1) or is_function(function, 2) do
     base_dir = Keyword.get(options, :base_dir, default_base_dir())
-    dirname = Keyword.get(options, :dirname, random_uid())
+    prefix = Keyword.get(options, :prefix)
     timeout = Keyword.get(options, :timeout, :infinity)
     cleaner = Keyword.get(options, :cleaner, Tmp.Cleaner)
+    dirname = dirname(prefix)
 
     Tmp.Worker.execute(base_dir, dirname, function, timeout, cleaner)
   end
 
-  defp random_uid do
-    :crypto.strong_rand_bytes(10) |> Base.encode16(case: :lower)
+  defp dirname(_prefix = nil), do: rand_dirname()
+  defp dirname(prefix), do: prefix <> "-" <> rand_dirname()
+
+  defp rand_dirname do
+    sec = :os.system_time(:second) |> Integer.to_string()
+    rand = :crypto.strong_rand_bytes(5) |> Base.encode16(case: :lower)
+
+    sec <> "-" <> rand
   end
 
   defp default_base_dir do

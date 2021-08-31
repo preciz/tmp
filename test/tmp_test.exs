@@ -23,10 +23,8 @@ defmodule TmpTest do
       |> Base.encode16(case: :lower)
 
     base_dir = "/tmp/#{uid}/"
-    dirname = "yolo"
 
-    assert Path.join(base_dir, dirname) ==
-             Tmp.dir(fn path -> path end, base_dir: base_dir, dirname: dirname)
+    assert :ok == Tmp.dir(fn _path -> File.touch("a") end, base_dir: base_dir)
   end
 
   test "Temporary directory exists in default base dir" do
