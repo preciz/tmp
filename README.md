@@ -42,6 +42,16 @@ end, prefix: "yolo", base_dir: "/tmp/my_app")
 # => 4
 ```
 
+```elixir
+path_to_debug =
+  Tmp.dir(fn tmp_dir_path ->
+    # call `Tmp.keep()` to keep dir for debugging
+    Tmp.keep()
+
+    tmp_dir_path
+  end)
+```
+
 ## Config
 
 To configure the default base dir:

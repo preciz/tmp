@@ -1,17 +1,18 @@
-defmodule Tmp.Cleaner do
-  @moduledoc false
-
+defmodule Tmp.Monitor do
+  @moduledoc """
+  Monitors `Tmp.Worker` processes and removes
+  their directories on exits.
+  """
   require Logger
 
   use GenServer
 
-  def monitor(pid, dir, cleaner \\ __MODULE__)
-      when is_pid(pid) and is_binary(dir) and is_atom(cleaner) do
-    GenServer.cast(cleaner, {:monitor, {pid, dir}})
+  def monitor(dir, pid \\ self()) when is_binary(dir) and is_pid(pid) do
+    GenServer.cast(__MODULE__, {:monitor, {dir, pid}})
   end
 
-  def demonitor(pid, cleaner \\ __MODULE__) when is_pid(pid) and is_atom(cleaner) do
-    GenServer.call(cleaner, {:demonitor, pid})
+  def demonitor(pid \\ self()) when is_pid(pid) do
+    GenServer.call(__MODULE__, {:demonitor, pid})
   end
 
   def start_link(options \\ []) do
@@ -28,7 +29,7 @@ defmodule Tmp.Cleaner do
   end
 
   @impl GenServer
-  def handle_cast({:monitor, {pid, dir}}, state) do
+  def handle_cast({:monitor, {dir, pid}}, state) do
     monitor_ref = Process.monitor(pid)
 
     {:noreply, Map.put(state, pid, {monitor_ref, dir})}

@@ -4,7 +4,7 @@ defmodule Tmp.Application do
 
   def start(_type, _args) do
     children = [
-      Tmp.Cleaner
+      Tmp.Monitor
     ]
 
     Supervisor.start_link(children, name: __MODULE__, strategy: :one_for_one)

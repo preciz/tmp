@@ -8,7 +8,8 @@ defmodule Tmp do
 
   `function` runs in a new linked GenServer process.
   The directory is automatically removed when the function returns or the
-  process terminates.
+  process terminates. If you decide you want to keep the directory call
+  `Tmp.keep()` in the `function`.
 
   ## Options
 
@@ -20,10 +21,6 @@ defmodule Tmp do
 
     * `:timeout` - How long the function is allowed to run before the
       GenServer call terminates, defaults to :infinity
-
-    * `:cleaner` - The name of the `Tmp.Cleaner` GenServer. Defaults to
-      `Tmp.Cleaner`
-
 
   ## Examples
 
@@ -39,10 +36,26 @@ defmodule Tmp do
     base_dir = Keyword.get(options, :base_dir, default_base_dir())
     prefix = Keyword.get(options, :prefix)
     timeout = Keyword.get(options, :timeout, :infinity)
-    cleaner = Keyword.get(options, :cleaner, Tmp.Cleaner)
     dirname = dirname(prefix)
 
-    Tmp.Worker.execute(base_dir, dirname, function, timeout, cleaner)
+    Tmp.Worker.execute(base_dir, dirname, function, timeout)
+  end
+
+  @doc """
+  Keeps `Tmp.Monitor` from removing the temporary directory.
+
+      iex> path =
+      ...>   Tmp.dir(fn tmp_dir_path ->
+      ...>     Tmp.keep()
+      ...>     tmp_dir_path
+      ...>   end)
+      ...> File.exists?(path)
+      ...> true
+
+  """
+  @spec keep(pid) :: :ok
+  def keep(pid \\ self()) do
+    Tmp.Monitor.demonitor(pid)
   end
 
   defp dirname(_prefix = nil), do: rand_dirname()

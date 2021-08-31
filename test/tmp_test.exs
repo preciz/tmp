@@ -2,15 +2,15 @@ defmodule TmpTest do
   use ExUnit.Case, async: true
   doctest Tmp
 
-  test "Auto cleans after process terminates" do
-    temp_dir_path =
-      Tmp.dir(fn temp_dir_path ->
-        temp_dir_path
+  test "Deletes dir after process terminates" do
+    tmp_dir_path =
+      Tmp.dir(fn tmp_dir_path ->
+        tmp_dir_path
       end)
 
-    Process.sleep(50)
+    Process.sleep(100)
 
-    refute File.exists?(temp_dir_path)
+    refute File.exists?(tmp_dir_path)
   end
 
   test "Returns with return value from function" do
@@ -27,42 +27,54 @@ defmodule TmpTest do
     assert :ok == Tmp.dir(fn path -> File.touch(Path.join(path, "a")) end, base_dir: base_dir)
   end
 
-  test "Temporary directory exists in default base dir" do
-    temp_pid =
-      Tmp.dir(fn temp_dir_path ->
-        assert File.exists?(temp_dir_path)
+  test "temporary directory exists in default base dir" do
+    tmp_pid =
+      Tmp.dir(fn tmp_dir_path ->
+        assert File.exists?(tmp_dir_path)
 
-        assert Path.dirname(temp_dir_path) == System.tmp_dir()
+        assert Path.dirname(tmp_dir_path) == System.tmp_dir()
         self()
       end)
 
-    refute Process.alive?(temp_pid)
+    refute Process.alive?(tmp_pid)
   end
 
-  test "Temporary process exits when function returns" do
-    temp_pid = Tmp.dir(fn _ -> self() end)
+  test "temporary process exits when function returns" do
+    tmp_pid = Tmp.dir(fn _ -> self() end)
 
-    refute Process.alive?(temp_pid)
+    refute Process.alive?(tmp_pid)
   end
 
-  test "Temporary directory is removed when parent process exits" do
+  test "temporary directory is removed when parent process exits" do
     test_pid = self()
 
     pid =
       spawn(fn ->
-        Tmp.dir(fn temp_dir_path ->
-          send(test_pid, {:temp_dir_path, temp_dir_path})
+        Tmp.dir(fn tmp_dir_path ->
+          send(test_pid, {:tmp_dir_path, tmp_dir_path})
           Process.sleep(:infinity)
         end)
       end)
 
     receive do
-      {:temp_dir_path, temp_dir_path} ->
-        assert File.exists?(temp_dir_path)
+      {:tmp_dir_path, tmp_dir_path} ->
+        assert File.exists?(tmp_dir_path)
         assert Process.alive?(pid)
         Process.exit(pid, :kill)
         Process.sleep(100)
-        refute File.exists?(temp_dir_path)
+        refute File.exists?(tmp_dir_path)
     end
+  end
+
+  test "keeps monitored dir if instructed" do
+    path =
+      Tmp.dir(fn tmp_dir_path ->
+        Tmp.keep()
+
+        tmp_dir_path
+      end)
+
+    Process.sleep(100)
+    assert File.exists?(path)
   end
 end
