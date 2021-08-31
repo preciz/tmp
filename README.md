@@ -18,9 +18,14 @@ end
 
 ## Usage
 
-`Tmp.dir/2` accepts a function that will run in a new linked GenServer process.
-The function will be called with the path of a new temporary directory.
-If the function returns or the parent process exits the temporary directory is removed.
+`Tmp.dir/2` accepts a function that will be called with the path of a new temporary directory.
+If the function returns or the calling process exits the temporary directory is removed.
+
+```elixir
+Tmp.dir(fn tmp_dir_path ->
+  # ... do work with the path
+end)
+```
 
 Options:
  - `:base_dir` defaults to `System.tmp_dir()`
