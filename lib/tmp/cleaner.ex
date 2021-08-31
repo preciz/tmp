@@ -65,7 +65,7 @@ defmodule Tmp.Cleaner do
   def terminate(_reason, state) do
     state
     |> Enum.each(fn {_pid, {_monitor_ref, dir}} ->
-      File.rm_rf!(dir)
+      File.rm_rf(dir)
     end)
   end
 end
