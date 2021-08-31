@@ -25,7 +25,8 @@ defmodule TmpTest do
     base_dir = "/tmp/#{uid}/"
     dirname = "yolo"
 
-    assert Path.join(base_dir, dirname) == Tmp.dir(fn path -> path end, base_dir: base_dir, dirname: dirname)
+    assert Path.join(base_dir, dirname) ==
+             Tmp.dir(fn path -> path end, base_dir: base_dir, dirname: dirname)
   end
 
   test "Temporary directory exists in default base dir" do

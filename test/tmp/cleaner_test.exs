@@ -21,7 +21,7 @@ defmodule Tmp.CleanerTest do
         {:tmp_dir, dir} -> dir
       end
 
-   assert File.exists?(dir)
+    assert File.exists?(dir)
 
     # let the cleaner state update
     Process.sleep(100)
@@ -31,6 +31,6 @@ defmodule Tmp.CleanerTest do
     # let terminate/2 of the cleaner GenServer finish
     Process.sleep(100)
 
-   refute File.exists?(dir)
+    refute File.exists?(dir)
   end
 end

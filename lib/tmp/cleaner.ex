@@ -5,7 +5,8 @@ defmodule Tmp.Cleaner do
 
   use GenServer
 
-  def monitor(pid, dir, cleaner \\ __MODULE__) when is_pid(pid) and is_binary(dir) and is_atom(cleaner) do
+  def monitor(pid, dir, cleaner \\ __MODULE__)
+      when is_pid(pid) and is_binary(dir) and is_atom(cleaner) do
     GenServer.cast(cleaner, {:monitor, {pid, dir}})
   end
 
