@@ -1,6 +1,16 @@
 defmodule Tmp do
   @moduledoc """
   Temporary directories that are monitored and automatically removed.
+
+  ## Examples
+
+      iex> Tmp.dir(fn tmp_dir_path ->
+      ...>   _my_file_path = Path.join(tmp_dir_path, "my_file")
+      ...>   # do work with my_file_path...
+      ...>   # then return a value
+      ...>   {:ok, :foobar}
+      ...> end)
+      {:ok, :foobar}
   """
 
   @doc """
@@ -25,7 +35,7 @@ defmodule Tmp do
   ## Examples
 
       iex> Tmp.dir(fn tmp_dir_path ->
-      ...>   Path.join(tmp_dir_path, "my_new_file") |> File.touch()
+      ...>   :ok = Path.join(tmp_dir_path, "my_new_file") |> File.touch()
       ...>   1 + 1
       ...> end)
       2
