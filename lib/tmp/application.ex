@@ -1,6 +1,5 @@
 defmodule Tmp.Application do
   @moduledoc false
-
   use Application
 
   def start(_type, _args) do
@@ -8,7 +7,6 @@ defmodule Tmp.Application do
       Tmp.Cleaner
     ]
 
-    opts = [strategy: :one_for_one, name: Tmp.Supervisor]
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link(children, name: __MODULE__, strategy: :one_for_one)
   end
 end
