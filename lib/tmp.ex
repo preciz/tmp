@@ -47,8 +47,9 @@ defmodule Tmp do
     prefix = Keyword.get(options, :prefix)
     timeout = Keyword.get(options, :timeout, :infinity)
     dirname = dirname(prefix)
+    path = Path.join(base_dir, dirname)
 
-    Tmp.Worker.execute(base_dir, dirname, function, timeout)
+    Tmp.Worker.execute(path, function, timeout)
   end
 
   @doc """

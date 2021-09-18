@@ -6,18 +6,13 @@ defmodule Tmp.Worker do
   use GenServer, restart: :temporary
 
   defmodule State do
-    @enforce_keys [:path, :base_dir, :dirname, :function]
-    defstruct [:path, :base_dir, :dirname, :function]
+    @enforce_keys [:path, :function]
+    defstruct [:path, :function]
   end
 
-  @spec execute(binary, Path.t(), function, timeout) :: term()
-  def execute(base_dir, dirname, function, timeout) when is_binary(dirname) and is_function(function) do
-    state = %State{
-      base_dir: base_dir,
-      dirname: dirname,
-      path: Path.join(base_dir, dirname),
-      function: function
-    }
+  @spec execute(Path.t(), function, timeout) :: term()
+  def execute(path, function, timeout) when is_function(function, 1) do
+    state = %State{path: path, function: function}
 
     {:ok, pid} = start_link(state)
 
