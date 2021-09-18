@@ -3,14 +3,20 @@ defmodule TmpTest do
   doctest Tmp
 
   test "Deletes dir after process terminates" do
-    tmp_dir_path =
+    file_path =
       Tmp.dir(fn tmp_dir_path ->
-        tmp_dir_path
+        file_path = Path.join(tmp_dir_path, "my_file")
+
+        :ok = File.touch(file_path)
+
+        assert File.exists?(file_path)
+
+        file_path
       end)
 
     Process.sleep(100)
 
-    refute File.exists?(tmp_dir_path)
+    refute File.exists?(file_path)
   end
 
   test "Returns with return value from function" do
