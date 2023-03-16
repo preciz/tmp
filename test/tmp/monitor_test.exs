@@ -5,12 +5,10 @@ defmodule Tmp.MonitorTest do
     pid = self()
 
     spawn(fn ->
-      Tmp.dir(
-        fn dir ->
-          send(pid, {:tmp_dir, dir})
-          Process.sleep(:infinity)
-        end
-      )
+      Tmp.dir(fn dir ->
+        send(pid, {:tmp_dir, dir})
+        Process.sleep(:infinity)
+      end)
     end)
 
     dir =
