@@ -43,13 +43,19 @@ end, prefix: "yolo", base_dir: "/tmp/my_app")
 ```
 
 ```elixir
-path_to_debug =
-  Tmp.dir(fn tmp_dir_path ->
-    # call `Tmp.keep()` to keep dir for debugging
-    Tmp.keep()
+Tmp.dir(fn tmp_dir_path ->
+  case work(tmp_dir_path) do
+    {:ok, result} ->
+      {:ok, result}
 
-    tmp_dir_path
-  end)
+    {:error, reason} ->
+      # call `Tmp.keep()` to keep dir for debugging
+      Tmp.keep()
+
+      Logger.error("Error: #{inspect(reason)}, tmp dir: #{tmp_dir_path}")
+
+      {:error, reason}
+end)
 ```
 
 ## Config
