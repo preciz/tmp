@@ -3,8 +3,6 @@ defmodule Tmp.Monitor do
   Monitors `Tmp.Worker` processes and removes
   their directories on exits.
   """
-  require Logger
-
   use GenServer
 
   def monitor(dir, pid \\ self()) when is_binary(dir) and is_pid(pid) do
