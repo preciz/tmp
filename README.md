@@ -1,6 +1,6 @@
 # Tmp
 
-![Actions Status](https://github.com/preciz/tmp/workflows/test/badge.svg)
+![Actions Status](https://github.com/preciz/tmp/workflows/test/badge.svg?branch=master)
 
 Temporary directories that are monitored and automatically removed.
 
