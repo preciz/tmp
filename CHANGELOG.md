@@ -2,6 +2,7 @@
 
 ## v0.3.0
 
+* Breaking: Tmp is no longer an application
 * Breaking: Removed `keep` functionality
 
 ## v0.2.0

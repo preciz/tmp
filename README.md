@@ -18,16 +18,36 @@ end
 
 ## Usage
 
-`Tmp.dir/2` accepts a function that will be called with the path of a new temporary directory.
-The temporary directory is automatically removed when the function returns or the calling process exits.
+Define your Tmp module:
 
 ```elixir
-Tmp.dir(fn tmp_dir_path ->
-  # ... do work with tmp_dir_path
+defmodule MyApp.Tmp do
+  use Tmp
+end
+```
+
+Add it to your supervision tree:
+
+```elixir
+children = [
+  {MyApp.Tmp, name: MyApp.Tmp}
+]
+```
+
+Use it in your code:
+
+```elixir
+MyApp.Tmp.dir(fn tmp_dir_path ->
+  file_path = Path.join(tmp_dir_path, "my_file")
+  # do work with file_path...
+  # then return a value
+  {:ok, :work_done}
 end)
 ```
 
 ### Options
+
+When calling `MyApp.Tmp.dir/2`, you can pass the following options:
 
 - `:prefix` (optional) - Prefix for the temporary directory name, defaults to `nil`
 - `:base_dir` (optional) - Base directory for the temporary directory, defaults to `System.tmp_dir()`
@@ -38,7 +58,7 @@ end)
 Basic usage:
 
 ```elixir
-Tmp.dir(fn tmp_dir_path ->
+MyApp.Tmp.dir(fn tmp_dir_path ->
   File.touch(Path.join(tmp_dir_path, "file_one"))
   # ... other important work
 
@@ -50,7 +70,7 @@ end, prefix: "my_app", base_dir: "/tmp/custom_base")
 Error handling:
 
 ```elixir
-Tmp.dir(fn tmp_dir_path ->
+MyApp.Tmp.dir(fn tmp_dir_path ->
   case work(tmp_dir_path) do
     {:ok, result} ->
       {:ok, result}
@@ -60,14 +80,6 @@ Tmp.dir(fn tmp_dir_path ->
       {:error, reason}
   end
 end)
-```
-
-## Config
-
-(Optional) To configure the default base directory:
-
-```elixir
-config :tmp, default_base_dir: "/tmp/my_custom_dir"
 ```
 
 ## Docs
