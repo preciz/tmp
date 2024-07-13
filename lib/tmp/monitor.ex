@@ -1,7 +1,15 @@
 defmodule Tmp.Monitor do
   @moduledoc """
-  Monitors `Tmp.Worker` processes and removes
-  their directories on exits.
+  Monitors `Tmp.Worker` processes and removes their associated temporary directories when the processes exit.
+  It is typically started as part of the Tmp supervision tree and should not be used directly.
+
+  This module is responsible for:
+  - Keeping track of temporary directories created by `Tmp.Worker` processes
+  - Monitoring these processes for termination
+  - Automatically removing the associated temporary directories when the monitored processes exit
+  - Cleaning up all monitored directories when the monitor itself terminates
+
+  The `Tmp.Worker` will automatically register directories with this monitor.
   """
   use GenServer
 
