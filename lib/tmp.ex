@@ -58,10 +58,13 @@ defmodule Tmp do
 
   ## Options
 
-    * `:base_dir` - The directory where `:dirname` is going to be created.
-      Defaults to `System.tmp_dir()`.
+    * `:base_dir` - The directory where the temporary directory will be created.
+      Defaults to `System.tmp_dir()`. This directory serves as the parent
+      directory and won't be removed when the function returns. Only the
+      newly created temporary directory within `:base_dir` will be cleaned up.
 
-    * `:prefix` - Prefix the directory name
+    * `:prefix` - A string to prefix the temporary directory name. This can be
+      useful for identifying the purpose or origin of the temporary directory.
 
     * `:timeout` - How long the function is allowed to run before the
       GenServer call terminates, defaults to :infinity
