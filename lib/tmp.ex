@@ -10,6 +10,12 @@ defmodule Tmp do
         use Tmp
       end
 
+  Or with a custom base directory:
+
+      defmodule MyApp.CustomTmp do
+        use Tmp, base_dir: "/path/to/custom/base/dir"
+      end
+
   Add it to your supervision tree:
 
       children = [
@@ -24,11 +30,19 @@ defmodule Tmp do
         # then return a value
         {:ok, :foobar}
       end)
+
+  You can also override the base directory for a specific call:
+
+      MyApp.Tmp.dir(fn tmp_dir_path ->
+        # ...
+      end, base_dir: "/path/to/another/base/dir")
   """
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
     quote do
       use Supervisor
+
+      @base_dir unquote(Keyword.get(opts, :base_dir))
 
       def start_link(opts) do
         Supervisor.start_link(__MODULE__, opts, name: opts[:name])
@@ -44,6 +58,7 @@ defmodule Tmp do
       end
 
       def dir(function, options \\ []) when is_function(function, 1) do
+        options = Keyword.put_new(options, :base_dir, @base_dir)
         Tmp.dir(__MODULE__, function, options)
       end
     end
@@ -78,7 +93,7 @@ defmodule Tmp do
   """
   @spec dir(module(), function(), keyword()) :: term()
   def dir(module, function, options \\ []) when is_function(function, 1) do
-    base_dir = Keyword.get(options, :base_dir, System.tmp_dir())
+    base_dir = Keyword.get(options, :base_dir) || System.tmp_dir()
     prefix = Keyword.get(options, :prefix)
     timeout = Keyword.get(options, :timeout, :infinity)
     dirname = dirname(prefix)

@@ -44,6 +44,9 @@ defmodule TmpTest do
                base_dir: base_dir,
                prefix: "test_base_dir"
              )
+
+    Process.sleep(100)
+    File.rmdir!(base_dir)
   end
 
   test "temporary directory exists in default base dir with correct prefix" do
@@ -152,5 +155,39 @@ defmodule TmpTest do
                prefix: "test_timeout"
              )
            )
+  end
+
+  test "uses base_dir option when provided" do
+    custom_base_dir = Path.join(System.tmp_dir(), "custom_base_dir")
+    File.mkdir_p!(custom_base_dir)
+
+    TestTmp.dir(
+      fn tmp_dir_path ->
+        assert String.starts_with?(tmp_dir_path, custom_base_dir)
+        assert File.exists?(tmp_dir_path)
+      end,
+      base_dir: custom_base_dir,
+      prefix: "test_custom_base_dir"
+    )
+  end
+
+  test "uses base_dir from use Tmp when set" do
+    defmodule CustomBaseDirTmp do
+      use Tmp, base_dir: Path.join(System.tmp_dir(), "custom_base_dir_module")
+    end
+
+    start_supervised!({CustomBaseDirTmp, name: CustomBaseDirTmp})
+
+    CustomBaseDirTmp.dir(
+      fn tmp_dir_path ->
+        assert String.starts_with?(
+                 tmp_dir_path,
+                 Path.join(System.tmp_dir(), "custom_base_dir_module")
+               )
+
+        assert File.exists?(tmp_dir_path)
+      end,
+      prefix: "test_custom_base_dir_module"
+    )
   end
 end
