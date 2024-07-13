@@ -74,4 +74,26 @@ defmodule TmpTest do
     end
   end
 
+  test "two Tmp Supervisors can be started and used independently" do
+    defmodule TestTmp1 do
+      use Tmp
+    end
+
+    defmodule TestTmp2 do
+      use Tmp
+    end
+
+    start_supervised!({TestTmp1, name: TestTmp1})
+    start_supervised!({TestTmp2, name: TestTmp2})
+
+    tmp1_dir = TestTmp1.dir(fn path -> assert File.exists?(path); path end)
+    tmp2_dir = TestTmp2.dir(fn path -> assert File.exists?(path); path end)
+
+    assert tmp1_dir != tmp2_dir
+
+    # Clean up
+    Process.sleep(100)
+    refute File.exists?(tmp1_dir)
+    refute File.exists?(tmp2_dir)
+  end
 end
