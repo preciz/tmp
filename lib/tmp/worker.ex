@@ -1,6 +1,11 @@
 defmodule Tmp.Worker do
   @moduledoc """
-  Executes the function given to `Tmp.dir/3` in a GenServer process
+  Executes the function given to `Tmp.dir/3` in a temporary GenServer process.
+  This module is not typically used directly.
+
+  This module is responsible for:
+  - Creating a temporary directory
+  - Ensuring the directory is monitored for cleanup
   """
 
   use GenServer, restart: :temporary
