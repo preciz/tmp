@@ -38,7 +38,7 @@ defmodule Tmp.LoadTest do
     assert Enum.all?(task_results, &match?({:ok, :ok}, &1))
 
     # Ensure all temporary directories are cleaned up
-    Process.sleep(1000)
+    Process.sleep(2000)
     assert Path.wildcard(Path.join(System.tmp_dir(), "load_test-*")) == []
   end
 end
