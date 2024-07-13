@@ -11,7 +11,7 @@ The package can be installed by adding `tmp` to your list of dependencies in `mi
 ```elixir
 def deps do
   [
-    {:tmp, "~> 0.2.0"}
+    {:tmp, "~> 0.3.0"}
   ]
 end
 ```
@@ -19,7 +19,7 @@ end
 ## Usage
 
 `Tmp.dir/2` accepts a function that will be called with the path of a new temporary directory.
-If the function returns or the calling process exits the temporary directory is removed.
+The temporary directory is automatically removed when the function returns or the calling process exits.
 
 ```elixir
 Tmp.dir(fn tmp_dir_path ->
@@ -27,10 +27,15 @@ Tmp.dir(fn tmp_dir_path ->
 end)
 ```
 
-Options:
- - `:prefix` (optional) prefix for the temporary directory, defaults to `nil`
- - `:base_dir` (optional) base directory of the temprorary directory, defaults to `System.tmp_dir()`
- - `:timeout` (optional) a timeout in milliseconds, defaults to `:infinity`
+### Options
+
+- `:prefix` (optional) - Prefix for the temporary directory name, defaults to `nil`
+- `:base_dir` (optional) - Base directory for the temporary directory, defaults to `System.tmp_dir()`
+- `:timeout` (optional) - Timeout in milliseconds, defaults to `:infinity`
+
+### Examples
+
+Basic usage:
 
 ```elixir
 Tmp.dir(fn tmp_dir_path ->
@@ -38,9 +43,11 @@ Tmp.dir(fn tmp_dir_path ->
   # ... other important work
 
   2 + 2
-end, prefix: "yolo", base_dir: "/tmp/my_app")
+end, prefix: "my_app", base_dir: "/tmp/custom_base")
 # => 4
 ```
+
+Error handling:
 
 ```elixir
 Tmp.dir(fn tmp_dir_path ->
@@ -50,7 +57,6 @@ Tmp.dir(fn tmp_dir_path ->
 
     {:error, reason} ->
       Logger.error("Error: #{inspect(reason)}, tmp dir: #{tmp_dir_path}")
-
       {:error, reason}
   end
 end)
@@ -58,9 +64,10 @@ end)
 
 ## Config
 
-(Optional) To configure the default base dir:
-```
-config :tmp, default_base_dir: "/tmp/my_dir"
+(Optional) To configure the default base directory:
+
+```elixir
+config :tmp, default_base_dir: "/tmp/my_custom_dir"
 ```
 
 ## Docs

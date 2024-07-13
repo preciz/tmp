@@ -1,7 +1,7 @@
 defmodule Tmp.MixProject do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.3.0"
   @github "https://github.com/preciz/tmp"
 
   def project do
