@@ -9,9 +9,6 @@ defmodule Tmp.Monitor do
     GenServer.cast(__MODULE__, {:monitor, {dir, pid}})
   end
 
-  def demonitor(pid \\ self()) when is_pid(pid) do
-    GenServer.call(__MODULE__, {:demonitor, pid})
-  end
 
   def start_link(options \\ []) do
     name = Keyword.get(options, :name, __MODULE__)
@@ -33,16 +30,6 @@ defmodule Tmp.Monitor do
     {:noreply, Map.put(state, pid, {monitor_ref, dir})}
   end
 
-  @impl GenServer
-  def handle_call({:demonitor, pid}, _from, state) do
-    {val, new_state} = Map.pop(state, pid)
-
-    with {monitor_ref, _dir} <- val do
-      Process.demonitor(monitor_ref)
-    end
-
-    {:reply, :ok, new_state}
-  end
 
   @impl GenServer
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do

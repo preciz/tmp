@@ -49,12 +49,10 @@ Tmp.dir(fn tmp_dir_path ->
       {:ok, result}
 
     {:error, reason} ->
-      # call `Tmp.keep()` to keep dir for debugging
-      Tmp.keep()
-
       Logger.error("Error: #{inspect(reason)}, tmp dir: #{tmp_dir_path}")
 
       {:error, reason}
+  end
 end)
 ```
 

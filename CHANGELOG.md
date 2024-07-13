@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.0
+
+* Breaking: Removed `keep` functionality
+
 ## v0.2.0
 
 

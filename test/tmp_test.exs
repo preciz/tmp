@@ -72,15 +72,4 @@ defmodule TmpTest do
     end
   end
 
-  test "keeps monitored dir if instructed" do
-    path =
-      Tmp.dir(fn tmp_dir_path ->
-        Tmp.keep()
-
-        tmp_dir_path
-      end)
-
-    Process.sleep(100)
-    assert File.exists?(path)
-  end
 end

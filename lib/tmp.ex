@@ -52,22 +52,6 @@ defmodule Tmp do
     Tmp.Worker.execute(path, function, timeout)
   end
 
-  @doc """
-  Keeps `Tmp.Monitor` from removing the temporary directory.
-
-      iex> path =
-      ...>   Tmp.dir(fn tmp_dir_path ->
-      ...>     Tmp.keep()
-      ...>     tmp_dir_path
-      ...>   end)
-      ...> File.exists?(path)
-      true
-
-  """
-  @spec keep(pid) :: :ok
-  def keep(pid \\ self()) do
-    Tmp.Monitor.demonitor(pid)
-  end
 
   defp dirname(_prefix = nil), do: rand_dirname()
   defp dirname(prefix), do: prefix <> "-" <> rand_dirname()
