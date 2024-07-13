@@ -48,6 +48,7 @@ MyApp.Tmp.dir(fn tmp_dir_path ->
   # then return a value
   {:ok, :work_done}
 end)
+# => {:ok, :work_done}
 ```
 
 ### Options
@@ -58,9 +59,7 @@ When calling `MyApp.Tmp.dir/2`, you can pass the following options:
 - `:base_dir` (optional) - Base directory for the temporary directory, defaults to `System.tmp_dir()` or the value set in `use Tmp`
 - `:timeout` (optional) - Timeout in milliseconds, defaults to `:infinity`
 
-### Examples
-
-Basic usage:
+### More Examples
 
 ```elixir
 MyApp.Tmp.dir(fn tmp_dir_path ->
@@ -70,16 +69,6 @@ MyApp.Tmp.dir(fn tmp_dir_path ->
   2 + 2
 end, prefix: "my_app", base_dir: "/tmp/custom_base")
 # => 4
-```
-
-Using a custom base directory:
-
-```elixir
-MyApp.CustomTmp.dir(fn tmp_dir_path ->
-  # tmp_dir_path will be within "/path/to/custom/base/dir"
-  File.touch(Path.join(tmp_dir_path, "file_in_custom_dir"))
-  # ... other work
-end)
 ```
 
 ## Docs
