@@ -105,4 +105,18 @@ defmodule TmpTest do
     refute File.exists?(tmp1_dir)
     refute File.exists?(tmp2_dir)
   end
+
+  test "temporary directory name has correct format with prefix" do
+    TestTmp.dir(fn tmp_dir_path ->
+      dir_name = Path.basename(tmp_dir_path)
+      assert String.starts_with?(dir_name, "test_prefix-")
+      [_prefix, timestamp, random] = String.split(dir_name, "-")
+      assert String.length(timestamp) > 0
+      assert String.length(random) == 10
+    end, prefix: "test_prefix")
+  end
+
+  test "respects timeout option" do
+    assert catch_exit(TestTmp.dir(fn _ -> Process.sleep(:infinity) end, timeout: 100))
+  end
 end
