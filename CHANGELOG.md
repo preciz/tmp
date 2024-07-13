@@ -2,7 +2,7 @@
 
 ## v0.3.0
 
-* Breaking: Tmp is no longer an application
+* Breaking: Tmp is no longer an application, it's now a supervisor that you can add to your application's supervision tree
 * Breaking: Removed `keep` functionality
 
 ## v0.2.0
