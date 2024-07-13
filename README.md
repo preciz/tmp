@@ -82,21 +82,6 @@ MyApp.CustomTmp.dir(fn tmp_dir_path ->
 end)
 ```
 
-Error handling:
-
-```elixir
-MyApp.Tmp.dir(fn tmp_dir_path ->
-  case work(tmp_dir_path) do
-    {:ok, result} ->
-      {:ok, result}
-
-    {:error, reason} ->
-      Logger.error("Error: #{inspect(reason)}, tmp dir: #{tmp_dir_path}")
-      {:error, reason}
-  end
-end)
-```
-
 ## Docs
 
 Documentation can be found at [https://hexdocs.pm/tmp](https://hexdocs.pm/tmp).
