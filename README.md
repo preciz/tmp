@@ -2,7 +2,7 @@
 
 [![test](https://github.com/preciz/tmp/actions/workflows/test.yml/badge.svg)](https://github.com/preciz/tmp/actions/workflows/test.yml)
 
-Temporary directories that are monitored and automatically removed.
+Temporary directories that are monitored and automatically removed in Elixir.
 
 ## Installation
 
