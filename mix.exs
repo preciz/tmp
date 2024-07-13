@@ -24,10 +24,7 @@ defmodule Tmp.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      extra_applications: [:crypto],
-      mod: {Tmp.Application, []}
-    ]
+    [extra_applications: [:crypto]]
   end
 
   # Run "mix help deps" to learn about dependencies.

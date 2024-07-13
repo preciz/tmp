@@ -1,43 +1,46 @@
 defmodule TmpTest do
   use ExUnit.Case, async: true
-  doctest Tmp
+
+  defmodule TestTmp do
+    use Tmp
+  end
+
+  setup do
+    start_supervised!({TestTmp, name: TestTmp})
+    :ok
+  end
 
   test "Deletes dir after process terminates" do
     file_path =
-      Tmp.dir(fn tmp_dir_path ->
+      TestTmp.dir(fn tmp_dir_path ->
         file_path = Path.join(tmp_dir_path, "my_file")
-
         :ok = File.touch(file_path)
-
         assert File.exists?(file_path)
-
         file_path
       end)
 
     Process.sleep(100)
-
     refute File.exists?(file_path)
   end
 
   test "Returns with return value from function" do
-    assert 4 == Tmp.dir(fn _ -> 2 + 2 end)
+    assert 4 == TestTmp.dir(fn _ -> 2 + 2 end)
   end
 
-  test "Runs successfully when base_dir doesn't exists" do
+  test "Runs successfully when base_dir doesn't exist" do
     uid =
       :crypto.strong_rand_bytes(8)
       |> Base.encode16(case: :lower)
 
     base_dir = "/tmp/#{uid}/"
 
-    assert :ok == Tmp.dir(fn path -> File.touch(Path.join(path, "a")) end, base_dir: base_dir)
+    assert :ok == TestTmp.dir(fn path -> File.touch(Path.join(path, "a")) end, base_dir: base_dir)
   end
 
   test "temporary directory exists in default base dir" do
     tmp_pid =
-      Tmp.dir(fn tmp_dir_path ->
+      TestTmp.dir(fn tmp_dir_path ->
         assert File.exists?(tmp_dir_path)
-
         assert Path.dirname(tmp_dir_path) == System.tmp_dir()
         self()
       end)
@@ -46,8 +49,7 @@ defmodule TmpTest do
   end
 
   test "temporary process exits when function returns" do
-    tmp_pid = Tmp.dir(fn _ -> self() end)
-
+    tmp_pid = TestTmp.dir(fn _ -> self() end)
     refute Process.alive?(tmp_pid)
   end
 
@@ -56,7 +58,7 @@ defmodule TmpTest do
 
     pid =
       spawn(fn ->
-        Tmp.dir(fn tmp_dir_path ->
+        TestTmp.dir(fn tmp_dir_path ->
           send(test_pid, {:tmp_dir_path, tmp_dir_path})
           Process.sleep(:infinity)
         end)

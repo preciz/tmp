@@ -5,31 +5,26 @@ defmodule Tmp.Monitor do
   """
   use GenServer
 
-  def monitor(dir, pid \\ self()) when is_binary(dir) and is_pid(pid) do
-    GenServer.cast(__MODULE__, {:monitor, {dir, pid}})
+  def monitor(monitor, dir, pid \\ self()) when is_binary(dir) and is_pid(pid) do
+    GenServer.cast(monitor, {:monitor, {dir, pid}})
   end
 
-
-  def start_link(options \\ []) do
-    name = Keyword.get(options, :name, __MODULE__)
-
+  def start_link(options) do
+    name = Keyword.fetch!(options, :name)
     GenServer.start_link(__MODULE__, [], name: name)
   end
 
   @impl GenServer
   def init([]) do
     Process.flag(:trap_exit, true)
-
     {:ok, %{}}
   end
 
   @impl GenServer
   def handle_cast({:monitor, {dir, pid}}, state) do
     monitor_ref = Process.monitor(pid)
-
     {:noreply, Map.put(state, pid, {monitor_ref, dir})}
   end
-
 
   @impl GenServer
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do

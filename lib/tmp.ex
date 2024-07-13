@@ -2,30 +2,64 @@ defmodule Tmp do
   @moduledoc """
   Temporary directories that are monitored and automatically removed.
 
-  ## Examples
+  ## Usage
 
-      iex> Tmp.dir(fn tmp_dir_path ->
-      ...>   _my_file_path = Path.join(tmp_dir_path, "my_file")
-      ...>   # do work with my_file_path...
-      ...>   # then return a value
-      ...>   {:ok, :foobar}
-      ...> end)
-      {:ok, :foobar}
+  Define your Tmp module:
+
+      defmodule MyApp.Tmp do
+        use Tmp
+      end
+
+  Add it to your supervision tree:
+
+      children = [
+        {MyApp.Tmp, name: MyApp.Tmp}
+      ]
+
+  Use it in your code:
+
+      MyApp.Tmp.dir(fn tmp_dir_path ->
+        _my_file_path = Path.join(tmp_dir_path, "my_file")
+        # do work with my_file_path...
+        # then return a value
+        {:ok, :foobar}
+      end)
   """
+
+  defmacro __using__(_opts) do
+    quote do
+      use Supervisor
+
+      def start_link(opts) do
+        Supervisor.start_link(__MODULE__, opts, name: opts[:name])
+      end
+
+      @impl true
+      def init(opts) do
+        children = [
+          {Tmp.Monitor, name: Module.concat(__MODULE__, Monitor)}
+        ]
+
+        Supervisor.init(children, strategy: :one_for_one)
+      end
+
+      def dir(function, options \\ []) when is_function(function, 1) do
+        Tmp.dir(__MODULE__, function, options)
+      end
+    end
+  end
 
   @doc """
   Creates a temporary directory and passes the path to the given function.
 
   `function` runs in a new linked GenServer process.
   The directory is automatically removed when the function returns or the
-  process terminates. If you decide you want to keep the directory call
-  `Tmp.keep()` in the `function`.
+  process terminates.
 
   ## Options
 
     * `:base_dir` - The directory where `:dirname` is going to be created.
-      Defaults to `System.tmp_dir()`.  To customize the default `:base_dir`
-      use config: `config :tmp, :default_base_dir, "my_dir"`
+      Defaults to `System.tmp_dir()`.
 
     * `:prefix` - Prefix the directory name
 
@@ -34,24 +68,22 @@ defmodule Tmp do
 
   ## Examples
 
-      iex> Tmp.dir(fn tmp_dir_path ->
-      ...>   :ok = Path.join(tmp_dir_path, "my_new_file") |> File.touch()
-      ...>   1 + 1
-      ...> end)
-      2
-
+      MyApp.Tmp.dir(fn tmp_dir_path ->
+        :ok = Path.join(tmp_dir_path, "my_new_file") |> File.touch()
+        1 + 1
+      end)
   """
-  @spec dir(function, list) :: term()
-  def dir(function, options \\ []) when is_function(function, 1) do
-    base_dir = Keyword.get(options, :base_dir, default_base_dir())
+  @spec dir(module(), function(), keyword()) :: term()
+  def dir(module, function, options \\ []) when is_function(function, 1) do
+    base_dir = Keyword.get(options, :base_dir, System.tmp_dir())
     prefix = Keyword.get(options, :prefix)
     timeout = Keyword.get(options, :timeout, :infinity)
     dirname = dirname(prefix)
     path = Path.join(base_dir, dirname)
 
-    Tmp.Worker.execute(path, function, timeout)
+    monitor = Module.concat(module, Monitor)
+    Tmp.Worker.execute(monitor, path, function, timeout)
   end
-
 
   defp dirname(_prefix = nil), do: rand_dirname()
   defp dirname(prefix), do: prefix <> "-" <> rand_dirname()
@@ -61,9 +93,5 @@ defmodule Tmp do
     rand = :crypto.strong_rand_bytes(5) |> Base.encode16(case: :lower)
 
     sec <> "-" <> rand
-  end
-
-  defp default_base_dir do
-    Application.get_env(:tmp, :default_base_dir) || System.tmp_dir()
   end
 end

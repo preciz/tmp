@@ -1,18 +1,18 @@
 defmodule Tmp.Worker do
   @moduledoc """
-  Executes the function given to `Tmp.dir/2` in a GenServer process
+  Executes the function given to `Tmp.dir/3` in a GenServer process
   """
 
   use GenServer, restart: :temporary
 
   defmodule State do
-    @enforce_keys [:path, :function]
-    defstruct [:path, :function]
+    @enforce_keys [:monitor, :path, :function]
+    defstruct [:monitor, :path, :function]
   end
 
-  @spec execute(Path.t(), function, timeout) :: term()
-  def execute(path, function, timeout) when is_function(function, 1) do
-    state = %State{path: path, function: function}
+  @spec execute(GenServer.name(), Path.t(), function, timeout) :: term()
+  def execute(monitor, path, function, timeout) when is_function(function, 1) do
+    state = %State{monitor: monitor, path: path, function: function}
 
     {:ok, pid} = start_link(state)
 
@@ -24,9 +24,8 @@ defmodule Tmp.Worker do
   end
 
   @impl GenServer
-  def init(%State{path: path} = state) do
-    Tmp.Monitor.monitor(path)
-
+  def init(%State{monitor: monitor, path: path} = state) do
+    Tmp.Monitor.monitor(monitor, path)
     {:ok, state}
   end
 
