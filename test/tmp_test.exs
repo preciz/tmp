@@ -86,8 +86,17 @@ defmodule TmpTest do
     start_supervised!({TestTmp1, name: TestTmp1})
     start_supervised!({TestTmp2, name: TestTmp2})
 
-    tmp1_dir = TestTmp1.dir(fn path -> assert File.exists?(path); path end)
-    tmp2_dir = TestTmp2.dir(fn path -> assert File.exists?(path); path end)
+    tmp1_dir =
+      TestTmp1.dir(fn path ->
+        assert File.exists?(path)
+        path
+      end)
+
+    tmp2_dir =
+      TestTmp2.dir(fn path ->
+        assert File.exists?(path)
+        path
+      end)
 
     assert tmp1_dir != tmp2_dir
 
