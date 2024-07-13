@@ -18,10 +18,13 @@ defmodule Tmp.MonitorTest do
     pid = self()
 
     spawn(fn ->
-      TestTmp.dir(fn dir ->
-        send(pid, {:tmp_dir, dir})
-        Process.sleep(:infinity)
-      end)
+      TestTmp.dir(
+        fn dir ->
+          send(pid, {:tmp_dir, dir})
+          Process.sleep(:infinity)
+        end,
+        prefix: "test_monitor_crash"
+      )
     end)
 
     dir =

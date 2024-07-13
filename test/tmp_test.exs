@@ -12,19 +12,22 @@ defmodule TmpTest do
 
   test "Deletes dir after process terminates" do
     file_path =
-      TestTmp.dir(fn tmp_dir_path ->
-        file_path = Path.join(tmp_dir_path, "my_file")
-        :ok = File.touch(file_path)
-        assert File.exists?(file_path)
-        file_path
-      end)
+      TestTmp.dir(
+        fn tmp_dir_path ->
+          file_path = Path.join(tmp_dir_path, "my_file")
+          :ok = File.touch(file_path)
+          assert File.exists?(file_path)
+          file_path
+        end,
+        prefix: "test_delete_dir"
+      )
 
     Process.sleep(100)
     refute File.exists?(file_path)
   end
 
   test "Returns with return value from function" do
-    assert 4 == TestTmp.dir(fn _ -> 2 + 2 end)
+    assert 4 == TestTmp.dir(fn _ -> 2 + 2 end, prefix: "test_return_value")
   end
 
   test "Runs successfully when base_dir doesn't exist" do
@@ -34,22 +37,29 @@ defmodule TmpTest do
 
     base_dir = "/tmp/#{uid}/"
 
-    assert :ok == TestTmp.dir(fn path -> File.touch(Path.join(path, "a")) end, base_dir: base_dir)
+    assert :ok ==
+             TestTmp.dir(fn path -> File.touch(Path.join(path, "a")) end,
+               base_dir: base_dir,
+               prefix: "test_base_dir"
+             )
   end
 
   test "temporary directory exists in default base dir" do
     tmp_pid =
-      TestTmp.dir(fn tmp_dir_path ->
-        assert File.exists?(tmp_dir_path)
-        assert Path.dirname(tmp_dir_path) == System.tmp_dir()
-        self()
-      end)
+      TestTmp.dir(
+        fn tmp_dir_path ->
+          assert File.exists?(tmp_dir_path)
+          assert Path.dirname(tmp_dir_path) == System.tmp_dir()
+          self()
+        end,
+        prefix: "test_default_base_dir"
+      )
 
     refute Process.alive?(tmp_pid)
   end
 
   test "temporary process exits when function returns" do
-    tmp_pid = TestTmp.dir(fn _ -> self() end)
+    tmp_pid = TestTmp.dir(fn _ -> self() end, prefix: "test_process_exit")
     refute Process.alive?(tmp_pid)
   end
 
@@ -58,10 +68,13 @@ defmodule TmpTest do
 
     pid =
       spawn(fn ->
-        TestTmp.dir(fn tmp_dir_path ->
-          send(test_pid, {:tmp_dir_path, tmp_dir_path})
-          Process.sleep(:infinity)
-        end)
+        TestTmp.dir(
+          fn tmp_dir_path ->
+            send(test_pid, {:tmp_dir_path, tmp_dir_path})
+            Process.sleep(:infinity)
+          end,
+          prefix: "test_parent_exit"
+        )
       end)
 
     receive do
@@ -87,16 +100,22 @@ defmodule TmpTest do
     start_supervised!({TestTmp2, name: TestTmp2})
 
     tmp1_dir =
-      TestTmp1.dir(fn path ->
-        assert File.exists?(path)
-        path
-      end)
+      TestTmp1.dir(
+        fn path ->
+          assert File.exists?(path)
+          path
+        end,
+        prefix: "test_tmp1"
+      )
 
     tmp2_dir =
-      TestTmp2.dir(fn path ->
-        assert File.exists?(path)
-        path
-      end)
+      TestTmp2.dir(
+        fn path ->
+          assert File.exists?(path)
+          path
+        end,
+        prefix: "test_tmp2"
+      )
 
     assert tmp1_dir != tmp2_dir
 
@@ -107,16 +126,24 @@ defmodule TmpTest do
   end
 
   test "temporary directory name has correct format with prefix" do
-    TestTmp.dir(fn tmp_dir_path ->
-      dir_name = Path.basename(tmp_dir_path)
-      assert String.starts_with?(dir_name, "test_prefix-")
-      [_prefix, timestamp, random] = String.split(dir_name, "-")
-      assert String.length(timestamp) > 0
-      assert String.length(random) == 10
-    end, prefix: "test_prefix")
+    TestTmp.dir(
+      fn tmp_dir_path ->
+        dir_name = Path.basename(tmp_dir_path)
+        assert String.starts_with?(dir_name, "test_prefix-")
+        [_prefix, timestamp, random] = String.split(dir_name, "-")
+        assert String.length(timestamp) > 0
+        assert String.length(random) == 10
+      end,
+      prefix: "test_prefix"
+    )
   end
 
   test "respects timeout option" do
-    assert catch_exit(TestTmp.dir(fn _ -> Process.sleep(:infinity) end, timeout: 100))
+    assert catch_exit(
+             TestTmp.dir(fn _ -> Process.sleep(:infinity) end,
+               timeout: 100,
+               prefix: "test_timeout"
+             )
+           )
   end
 end
