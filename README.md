@@ -46,9 +46,9 @@ MyApp.Tmp.dir(fn tmp_dir_path ->
   file_path = Path.join(tmp_dir_path, "my_file")
   # do work with file_path...
   # then return a value
-  {:ok, :work_done}
+  Enum.sum([1,2,3])
 end)
-# => {:ok, :work_done}
+# => 6
 ```
 
 ### Options
