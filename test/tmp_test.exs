@@ -11,19 +11,21 @@ defmodule TmpTest do
   end
 
   test "Deletes dir after process terminates" do
-    file_path =
+    {file_path, tmp_dir_path} =
       TestTmp.dir(
         fn tmp_dir_path ->
+          assert String.starts_with?(Path.basename(tmp_dir_path), "test_delete_dir-")
           file_path = Path.join(tmp_dir_path, "my_file")
           :ok = File.touch(file_path)
           assert File.exists?(file_path)
-          file_path
+          {file_path, tmp_dir_path}
         end,
         prefix: "test_delete_dir"
       )
 
     Process.sleep(100)
     refute File.exists?(file_path)
+    refute File.exists?(tmp_dir_path)
   end
 
   test "Returns with return value from function" do
@@ -44,12 +46,13 @@ defmodule TmpTest do
              )
   end
 
-  test "temporary directory exists in default base dir" do
+  test "temporary directory exists in default base dir with correct prefix" do
     tmp_pid =
       TestTmp.dir(
         fn tmp_dir_path ->
           assert File.exists?(tmp_dir_path)
           assert Path.dirname(tmp_dir_path) == System.tmp_dir()
+          assert String.starts_with?(Path.basename(tmp_dir_path), "test_default_base_dir-")
           self()
         end,
         prefix: "test_default_base_dir"
@@ -130,9 +133,13 @@ defmodule TmpTest do
       fn tmp_dir_path ->
         dir_name = Path.basename(tmp_dir_path)
         assert String.starts_with?(dir_name, "test_prefix-")
-        [_prefix, timestamp, random] = String.split(dir_name, "-")
+        [prefix, timestamp, random] = String.split(dir_name, "-")
+        assert prefix == "test_prefix"
         assert String.length(timestamp) > 0
+        {timestamp_int, _} = Integer.parse(timestamp)
+        assert is_integer(timestamp_int)
         assert String.length(random) == 10
+        assert String.match?(random, ~r/^[a-f0-9]{10}$/)
       end,
       prefix: "test_prefix"
     )
