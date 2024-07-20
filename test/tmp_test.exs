@@ -190,4 +190,19 @@ defmodule TmpTest do
       prefix: "test_custom_base_dir_module"
     )
   end
+
+  test "dirname generates correct format with nil prefix" do
+    dirname = Tmp.dirname(nil)
+    assert String.match?(dirname, ~r/^\d+-[a-f0-9]{10}$/)
+  end
+
+  test "dirname generates correct format with non-nil prefix" do
+    dirname = Tmp.dirname("test")
+    assert String.match?(dirname, ~r/^test-\d+-[a-f0-9]{10}$/)
+  end
+
+  test "rand_dirname generates unique names" do
+    names = for _ <- 1..100, do: Tmp.rand_dirname()
+    assert length(Enum.uniq(names)) == 100
+  end
 end

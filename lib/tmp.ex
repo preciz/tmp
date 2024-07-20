@@ -103,10 +103,12 @@ defmodule Tmp do
     Tmp.Worker.execute(monitor, path, function, timeout)
   end
 
-  defp dirname(_prefix = nil), do: rand_dirname()
-  defp dirname(prefix), do: prefix <> "-" <> rand_dirname()
+  @doc false
+  def dirname(_prefix = nil), do: rand_dirname()
+  def dirname(prefix), do: prefix <> "-" <> rand_dirname()
 
-  defp rand_dirname do
+  @doc false
+  def rand_dirname do
     sec = :os.system_time(:second) |> Integer.to_string()
     rand = :crypto.strong_rand_bytes(5) |> Base.encode16(case: :lower)
 
