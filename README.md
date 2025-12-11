@@ -27,7 +27,7 @@ end
 
 # Or with a custom base directory
 defmodule MyApp.CustomTmp do
-  use Tmp, base_dir: "/path/where/tmp/dirs/will/be"
+  use Tmp, base_dir: "/tmp/my_dir"
 end
 ```
 
