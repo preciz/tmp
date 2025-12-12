@@ -14,7 +14,7 @@ defmodule Tmp.Monitor do
   use GenServer
 
   def monitor(monitor, dir, pid \\ self()) when is_binary(dir) and is_pid(pid) do
-    GenServer.cast(monitor, {:monitor, {dir, pid}})
+    GenServer.call(monitor, {:monitor, {dir, pid}})
   end
 
   def start_link(options) do
@@ -29,9 +29,9 @@ defmodule Tmp.Monitor do
   end
 
   @impl GenServer
-  def handle_cast({:monitor, {dir, pid}}, state) do
+  def handle_call({:monitor, {dir, pid}}, _from, state) do
     monitor_ref = Process.monitor(pid)
-    {:noreply, Map.put(state, pid, {monitor_ref, dir})}
+    {:reply, :ok, Map.put(state, pid, {monitor_ref, dir})}
   end
 
   @impl GenServer

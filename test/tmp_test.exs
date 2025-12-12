@@ -205,4 +205,23 @@ defmodule TmpTest do
     names = for _ <- 1..100, do: Tmp.rand_dirname()
     assert length(Enum.uniq(names)) == 100
   end
+
+  test "raises when monitor process does not exist" do
+    defmodule FakeModule do
+      # This module exists but doesn't implement Tmp behavior (no Monitor)
+    end
+
+    Process.flag(:trap_exit, true)
+
+    assert_raise MatchError, fn ->
+      Tmp.dir(FakeModule, fn _ -> :ok end)
+    end
+
+    # Clean up the EXIT message from the mailbox
+    receive do
+      {:EXIT, _, _} -> :ok
+    after
+      0 -> :ok
+    end
+  end
 end
