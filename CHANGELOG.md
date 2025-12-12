@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.1
+
+* Raise if no Monitor process running
+* Update ex_doc to 0.36
+* Update dependencies
+* Add more tests
+* Documentation updates
+
 ## v0.3.0
 
 * Breaking: Tmp is no longer an application, it's now a supervisor that you can add to your application's supervision tree, see the updated README for more information.
